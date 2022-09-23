@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  # This avoids having duplicate builds for a pull request
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.1.6
+        with:
+          poetry-version: 1.1.15
+      - name: Install dev dependencies
+        run: poetry install
+      - name: Check code formatting
+        run: poetry run black --check typed_ctypes.py test_typed_ctypes.py
+      - name: Check import ordering
+        run: poetry run isort --check typed_ctypes.py test_typed_ctypes.py
+      - name: Check static typing
+        run: poetry run mypy typed_ctypes.py test_typed_ctypes.py
+
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+        os: ["ubuntu-latest"]
+    name: Pytest (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      # Remove the lock file unless we're using the stable version of Python.
+      # This is required because older Python version require "polyfills" for
+      # some libraries
+      - name: Remove poetry.lock file
+        run: rm poetry.lock
+        if: ${{ matrix.python-version != '3.10' }}
+      - name: Install dev dependencies
+        run: poetry install
+      - name: Run pytest
+        run: poetry run pytest test_typed_ctypes.py
