@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "typed-ctypes"
+version = "0.1.0"
+description = ""
+authors = ["Andreas Runfalk <andreas@runfalk.se>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.971"
+black = "^22.8.0"
+isort = "^5.10.1"
+pytest = "^7.1.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+strict = true
