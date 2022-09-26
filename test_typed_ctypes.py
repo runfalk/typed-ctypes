@@ -1,4 +1,5 @@
 import ctypes
+from typing import Any, Optional, Type
 
 import pytest
 
@@ -74,3 +75,24 @@ def test_deep_inheritance() -> None:
     parent = Parent()
     parent.uint = 666
     assert parent.uint == 666
+
+
+@pytest.mark.parametrize(
+    "invalid_type",
+    [
+        bool,
+        bytes,
+        str,
+        Optional[bytes],
+        Optional[str],
+        Optional[int],
+    ],
+)
+def test_invalid_types(invalid_type: Type[Any]) -> None:
+    with pytest.raises(TypeError):
+
+        class InvalidProxy(StructProxy[Struct]):
+            uint: int
+            char: invalid_type  # type: ignore
+
+        print(InvalidProxy.__annotations__)
