@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.10"]
         os: ["ubuntu-latest"]
     name: Pytest (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -52,12 +52,6 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: 1.1.13
-      # Remove the lock file unless we're using the stable version of Python.
-      # This is required because older Python version require "polyfills" for
-      # some libraries
-      - name: Remove poetry.lock file
-        run: rm poetry.lock
-        if: ${{ matrix.python-version != '3.10' }}
       - name: Install dev dependencies
         run: poetry install
       - name: Run pytest
