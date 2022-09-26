@@ -1,6 +1,6 @@
 import ctypes
 import functools
-from typing import Any, Generic, Type, TypeVar, cast
+from typing import Any, Generic, Optional, Type, TypeVar, cast
 
 St = TypeVar("St", bound=ctypes.Structure)
 
@@ -31,12 +31,18 @@ class StructProxy(Generic[St]):
         self._struct = struct()
 
     def __init_subclass__(cls) -> None:
+        proxy_cls = _find_proxy_class(cls)
+        if proxy_cls is None:
+            raise TypeError(
+                f"The class {cls.__name__} doesn't inherit from StructProxy",
+            )
+
         struct = _get_struct_type(cls)
         struct_fields = {field[0] for field in struct._fields_}
         for field in struct_fields:
-            if field not in cls.__annotations__:
+            if field not in proxy_cls.__annotations__:
                 raise TypeError(
-                    f"Struct field {field} not annotated in {cls.__name__}",
+                    f"Struct field {field} not annotated in {proxy_cls.__name__}",
                 )
             # TODO: Validate types
             setattr(cls, field, FieldProxy(field))
@@ -45,6 +51,21 @@ class StructProxy(Generic[St]):
         return ctypes.byref(self._struct)
 
 
+def _find_proxy_class(cls: Type[StructProxy[St]]) -> Optional[Type[StructProxy[St]]]:
+    if StructProxy in cls.__bases__:
+        return cls
+
+    # Traverse the class hierarchy depth first to find the correct class
+    for parent in cls.__bases__:
+        x: Optional[Type[StructProxy[St]]] = _find_proxy_class(parent)
+        if x is not None:
+            return x
+    return None
+
+
 def _get_struct_type(cls: Type[StructProxy[St]]) -> Type[St]:
-    # TODO: Support multiple inheritence
-    return cls.__orig_bases__[0].__args__[0]  # type: ignore
+    for base_cls in getattr(cls, "__orig_bases__", []):
+        origin: Optional[Type[Any]] = getattr(base_cls, "__origin__", None)
+        if origin is StructProxy:
+            return base_cls.__args__[0]  # type: ignore
+    raise TypeError("Unable to find StructProxy in the inheritance hierarchy")
