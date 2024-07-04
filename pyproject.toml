@@ -6,13 +6,13 @@ authors = ["Andreas Runfalk <andreas@runfalk.se>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.dev-dependencies]
-mypy = "^0.971"
-black = "^22.8.0"
-isort = "^5.10.1"
-pytest = "^7.1.3"
+mypy = "^1.10.1"
+pytest = "^8.2.2"
+pyright = "^1.1.370"
+ruff = "^0.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -20,3 +20,150 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 strict = true
+warn_unused_ignores = false
+
+[tool.pyright]
+typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
+pythonVersion = "3.11"
+reportUnnecessaryTypeIgnoreComment = false
+reportMissingTypeStubs = false
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+# The following rulesets are intentionally not enabled:
+# - AIR (Airflow lints)
+# - BLE (flake8-blind-except)
+# - COM (flake8-commas)
+# - DJ (flake8-django)
+# - EM (flake8-errmsg)
+# - ERA (eradicate)
+# - INT (flake8-gettext)
+# - ISC (flake8-implicit-str-concat)
+# - INP (flake8-no-pep420)
+# - NPY (numpy lints)
+# - PD (pandas-vet)
+# - SLF (flake8-self)
+select = [
+    "A",  # flake8-builtins
+    "ANN",  # flake8-annotations
+    "ARG",  # flake8-unused-arguments
+    "ASYNC",  # flake8-async
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "DTZ",  # flake8-datetimez
+    "E",  # pycodestyle
+    "EXE",  # flake8-executable
+    "F",  # pyflakes
+    "FA",  # flake8-future-annotations
+    "FIX",  # flake8-fixme
+    "FLY",  # flynt
+    "G",  # flake8-logging-format
+    "I",  # isort
+    "ICN",  # flake8-import-conventions
+    "N",  # pep8-naming
+    "PGH",  # pygrep-hooks
+    "PL",  # pylint
+    "PIE",  # flake8-pie
+    "PT",  # flake8-pytest-style
+    "PTH",  # flake8-use-pathlib
+    "PYI",  # flake8-pyi
+    "Q",  # flake8-quotes
+    "RET",  # flake8-return
+    "RSE",  # flake8-raise
+    "RUF",  # ruff
+    "SIM",  # flake8-simplify
+    "UP",  # pyupgrade
+    "TID",  # flake8-tidy-imports
+    "TRY",  # tryceratops
+    "UP",  # pyupgrade
+    "T10",  # flake8-debugger
+    "T20",  # flake8-print
+    "TCH",  # flake8-type-checking
+    "TD",  # flake8-todos
+    "S",  # flake8-bandit
+]
+ignore = [
+    # flake8-builtins
+    # Allow class attribute to shadow builtins
+    "A003",
+
+    # flake8-annotations
+    # Don't force self to be typed
+    "ANN101",
+    # Don't force cls to be typed
+    "ANN102",
+    # Don't force return type annotations for dunder-methods
+    "ANN204",
+    # Allow the Any type to be used in type annotations
+    "ANN401",
+
+    # flake8-fixme
+    # Allow TODO statements
+    "FIX002",
+
+    # flake8-logging-format
+    # Allow f-strings in logging statements
+    "G004",
+
+    # pygrep-hooks
+    # Allow blanket # type: ignore
+    "PGH003",
+
+    # pylint
+    # Remove return statement limit
+    "PLR0911",
+    # Remove branch limit
+    "PLR0912",
+    # Remove argument count limit
+    "PLR0913",
+
+    # flake8-return
+    # Allow redundant variable assignments for return values since it makes
+    # using a debugger easier
+    "RET504",
+
+    # flake8-bandit
+    # Allow assert statements
+    "S101",
+    # We don't use random for cryptographic purposes
+    "S311",
+    # Silence annoying false positives around subprocess calls and user input
+    "S603",
+    "S607",
+
+    # flake8-simplify
+    # Allow lowercase environment variables, as we are required to use them
+    # within OTP
+    "SIM112",
+
+    # flake8-todos
+    # Allow TODO comments without an author
+    "TD002",
+    # Allow TODO comments without an issue link
+    "TD003",
+
+    # pylint
+    # Allow anonymous magic numbers (we use them a lot for HTTP status codes)
+    "PLR2004",
+
+    # flake8-pytest-style
+    # Allow broad pytest.raises() checks
+    "PT011",
+
+    # tryceratops
+    # Allow long inline exception messages
+    "TRY003",
+    # Allow return statements in try blocks
+    "TRY300",
+]
+
+[tool.ruff.lint.flake8-import-conventions]
+# Disallow `from` imports for the typing module
+banned-from = ["typing"]
+
+[tool.ruff.lint.flake8-import-conventions.aliases]
+# Force the typing module to be aliased as `t`
+typing = "t"

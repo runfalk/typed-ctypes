@@ -1,1 +1,3 @@
 *.py[co]
+target/
+Cargo.lock
