@@ -96,7 +96,7 @@ def struct() -> Struct:
 
 @pytest.fixture()
 def lib() -> TestLib:
-    path = Path(__file__).parent.joinpath("testffilib/target/debug/libtestffilib.so")
+    path = Path(__file__).parent.joinpath("testlib/target/debug/libtestlib.so")
     if not path.exists():
         pytest.fail("Unable to load FFI")
     return cdll_from_spec(path, TestLib)

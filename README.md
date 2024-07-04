@@ -17,7 +17,7 @@ print(s.missing)  # Not caught by type checkers
 
 This is because the default type definitions rely on
 `__getattr__` and the type checker doesn't know how to interpret the `_fields_`
-property. The [ctypes.Structure type definition[^1] in Python looks something
+property. The `ctypes.Structure` type definition[^1] in Python looks something
 like this:
 
 ```python
@@ -48,6 +48,19 @@ s.uint = 1
 print(s.uint)  # Prints 1
 s.missing  # Throws attribute error, and gets caught by any type checker
 ```
+
+ctypes support
+--------------
+Supported:
+
+* `ctypes.Structure` through `CStruct`
+* `ctypes.CDLL` through `cdll_from_spec`
+
+Unsupported
+
+* `ctypes.Union`
+* Array
+* Pointers, though structs can be passed to functions.
 
 Known issues
 ------------
@@ -87,6 +100,6 @@ class Struct(CStruct):
     @state.setter
     def state(self, state: State) -> None:
         self._state = state.value
-
+```
 
 [^1]: https://github.com/python/typeshed/blob/a702daa6311db14db603827cd649fcfab15f8f53/stdlib/ctypes/__init__.pyi#L248

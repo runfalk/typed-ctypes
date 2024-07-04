@@ -1,4 +1,4 @@
-
+#![allow(clippy::missing_safety_doc)]
 macro_rules! impl_tuple {
     ($struct_name:ident, $swap_fn:ident, $type:ty) => {
         #[repr(C)]
@@ -10,11 +10,9 @@ macro_rules! impl_tuple {
         #[no_mangle]
         pub unsafe extern "C" fn $swap_fn(s: *mut $struct_name) {
             let s = &mut *s;
-            let tmp = s.b;
-            s.b = s.a;
-            s.a = tmp;
+            std::mem::swap(&mut s.a, &mut s.b);
         }
-    }
+    };
 }
 
 macro_rules! impl_sub {
@@ -23,7 +21,7 @@ macro_rules! impl_sub {
         pub unsafe extern "C" fn $name(x: $type, y: $type) -> $type {
             x - y
         }
-    }
+    };
 }
 
 impl_tuple!(U8Tuple, swap_u8_tuple, u8);

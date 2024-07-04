@@ -107,4 +107,17 @@ if [[ $APPLY_FIXES -eq 0 ]]; then
 fi
 run_cmd $poetry_lock_cmd || exit_status=1
 
+# Rust checks
+pushd testlib
+cargo_fmt_cmd="cargo fmt --check"
+if [[ $APPLY_FIXES -eq 0 ]]; then
+    cargo_fmt_cmd="cargo fmt"
+fi
+run_cmd $cargo_fmt_cmd || exit_status=1
+
+cargo_clippy_cmd="cargo clippy -- --deny warnings"
+run_cmd $cargo_clippy_cmd || exit_status=1
+popd
+
+
 exit $exit_status
